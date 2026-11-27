@@ -33,6 +33,9 @@ spec:
           env:
             - name: DATABASE_URL
               value: postgresql://shortener@db:5432/shortener
+            # 8 replicas x (10 pooled + 1 health) connections stays under max_connections=100.
+            - name: DB_POOL_MAX
+              value: "10"
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
@@ -52,6 +55,12 @@ spec:
             tcpSocket:
               port: http
             periodSeconds: 15
+          lifecycle:
+            # Keep serving while the Ingress and Service drop this pod from their
+            # endpoints, so rollouts and scale-in do not refuse connections.
+            preStop:
+              exec:
+                command: [sleep, "5"]
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

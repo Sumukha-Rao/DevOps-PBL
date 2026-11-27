@@ -2,6 +2,20 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
 
+function copyWithTextarea(text) {
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.appendChild(area);
+  area.focus();
+  area.select();
+  const copied = document.execCommand('copy');
+  area.remove();
+  if (!copied) throw new Error('copy command was rejected');
+}
+
 function App() {
   const [url, setUrl] = useState('');
   const [link, setLink] = useState('');
@@ -38,7 +52,13 @@ function App() {
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(link);
+      // The Clipboard API exists only on secure origins (HTTPS or localhost).
+      // Plain HTTP, such as an Ingress host, falls back to a hidden textarea.
+      if (window.isSecureContext && navigator.clipboard) {
+        await navigator.clipboard.writeText(link);
+      } else {
+        copyWithTextarea(link);
+      }
       setCopyStatus('Copied to clipboard.');
     } catch {
       setCopyStatus('Select and copy the short link manually.');

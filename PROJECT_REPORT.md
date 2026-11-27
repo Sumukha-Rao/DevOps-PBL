@@ -29,8 +29,8 @@ A multi-stage Docker build compiles the React bundle with Node.js and copies it 
 | Method and path | Successful result | Other outcomes |
 | --- | --- | --- |
 | `GET /` | React application | |
-| `POST /api/links` | `201` with the code, short URL, and destination | `422` for invalid destinations, `503` if code allocation is exhausted |
-| `GET /s/{code}` | `307` with the destination in the `Location` header | `404` for unknown codes, `422` for malformed codes |
+| `POST /api/links` | `201` with the code, short URL, and destination | `422` for invalid destinations, `503` if code allocation is exhausted or the database is unreachable |
+| `GET /s/{code}` | `307` with the destination in the `Location` header | `404` for unknown codes, `422` for malformed codes, `503` if the database is unreachable |
 | `GET /health` | `200` when the app can query its table | `503` when the database query fails |
 
 ## Deployment scope

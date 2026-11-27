@@ -21,7 +21,10 @@ input { flex: 1; min-width: 0; border: 1px solid #898f84; background: #fff; }
 button { color: #fff; background: #205235; border: 1px solid transparent; cursor: pointer; font-weight: 650; }
 button:disabled { opacity: 0.65; cursor: wait; }
 :focus-visible { outline: 3px solid #456f51; outline-offset: 3px; }
-.result { margin-top: 22px; padding: 16px; background: #e1ecdf; border-radius: 9px; justify-content: space-between; overflow-wrap: anywhere; }
+.result { margin-top: 22px; padding: 16px; background: #e1ecdf; border-radius: 9px; justify-content: space-between; }
+.result > div { min-width: 0; }
+.result a { overflow-wrap: anywhere; }
+.result button { flex-shrink: 0; }
 [role="status"]:not(:empty) { margin-top: 10px; }
 .error { color: #8b2424; }
 

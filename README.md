@@ -25,6 +25,20 @@ Stop the services with `docker compose down`. PostgreSQL data persists in the na
 
 See [PROJECT_REPORT.md](PROJECT_REPORT.md) for the architecture, API contract, and validation results.
 
+## Run the end-to-end tests
+
+The Playwright suite in `e2e/` tests the running stack through the browser and the REST API. Start the stack first, then:
+
+```sh
+cd e2e
+npm ci
+npx playwright install chromium
+npm test              # UI and API tests
+npm run test:docker   # also recreates containers and stops the database
+```
+
+Set `BASE_URL` to test a different address (default `http://localhost:8000`). `npm run test:docker` runs `docker compose` against this repository's stack, so use it locally only. `npm run report` opens the HTML report.
+
 ### Build behind a TLS-inspecting proxy
 
 If the package registries use your organization's trusted proxy certificate, pass the system CA bundle to the build:
@@ -76,3 +90,11 @@ curl -fsS -H 'Host: shortener.test' -H 'Content-Type: application/json' \
 Set `INGRESS_IP` to the reachable controller IP before running these commands. Request the returned short link and check for HTTP 307 and the original destination in the `Location` header. For direct Service access, run `kubectl --context minikube -n url-shortener port-forward svc/shortener-api 8080:80` and open `http://localhost:8080`.
 
 The HPA targets 65% average CPU utilization relative to each API pod's 100m CPU request. It scales the API between two and eight replicas. Run `kubectl --context minikube -n url-shortener get hpa -w` to observe utilization and replica counts during traffic. PostgreSQL uses a single replica and retains its data on a 1 GiB claim.
+
+Each API pod keeps a pool of at most 10 database connections (`DB_POOL_MAX`) plus one for `/health`, so eight replicas stay under PostgreSQL's default limit of 100 connections. Lower `DB_POOL_MAX` if you raise `maxReplicas`.
+
+Minikube's Metrics Server reports CPU every 60 seconds, so the HPA reacts about a minute after load starts and misses short spikes. For a faster demo, lower the resolution to 15 seconds:
+
+```sh
+kubectl --context minikube -n kube-system patch deployment metrics-server --type=json -p "[{\"op\":\"replace\",\"path\":\"/spec/template/spec/containers/0/args\",\"value\":$(kubectl --context minikube -n kube-system get deploy metrics-server -o jsonpath='{.spec.template.spec.containers[0].args}' | sed 's/--metric-resolution=60s/--metric-resolution=15s/')}]"
+```

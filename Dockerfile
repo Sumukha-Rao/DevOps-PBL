@@ -22,4 +22,6 @@ COPY --chmod=644 app.py .
 COPY --from=frontend /build/dist ./dist
 USER 10001:10001
 EXPOSE 8000
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Keep idle connections open longer than ingress-nginx's 60 s upstream keepalive,
+# so the proxy never reuses a connection that uvicorn has just closed.
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "75"]

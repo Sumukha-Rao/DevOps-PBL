@@ -1,0 +1,15 @@
+{
+  "name": "url-shortener-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:docker": "cross-env E2E_DOCKER=1 playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "cross-env": "10.1.0"
+  }
+}
