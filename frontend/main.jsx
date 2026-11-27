@@ -68,12 +68,12 @@ function App() {
   return (
     <main>
       <header>
-        <span className="mark" aria-hidden="true">↗</span>
+        <span>Project 23</span>
         <a href="/docs">API docs</a>
       </header>
       <section aria-labelledby="title">
         <h1 id="title">URL Shortener</h1>
-        <p>Create a short link you can share.</p>
+        <p className="lede">Paste a long link. Get a short one you can share.</p>
         <form onSubmit={shorten}>
           <label htmlFor="url">Destination URL</label>
           <div className="row">
@@ -94,6 +94,10 @@ function App() {
         )}
         <div role="status">{copyStatus}</div>
       </section>
+      <footer>
+        <span>Client / API / Database</span>
+        <span>React, FastAPI, PostgreSQL</span>
+      </footer>
     </main>
   );
 }
